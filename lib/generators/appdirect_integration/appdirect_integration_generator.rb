@@ -1,7 +1,5 @@
-require 'rails/generators/base'
-
 module AppdirectIntegration
-  class InstallGenerator < Rails::Generators::Base
+  class AppdirectIntegrationGenerator < Rails::Generators::Base
     source_root File.expand_path("../templates", __FILE__)
 
     desc "Creates a AppdirectIntegration initializer and copy it to your application."
