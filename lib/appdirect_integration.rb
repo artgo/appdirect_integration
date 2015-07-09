@@ -1,5 +1,6 @@
 require 'appdirect_integration/version'
 require 'appdirect_integration/engine'
+require 'configurations'
 
 module AppdirectIntegration
 	include Configurations
@@ -9,8 +10,7 @@ module AppdirectIntegration
   configurable String, :consumer_secret
 
   configuration_defaults do |c|
-    #c.appdirect_url = 'https://www.appdirect.com'
-    c.appdirect_url = 'http://localhost:8080'
+    c.appdirect_url = 'https://www.appdirect.com'
   end
 
   not_configured :consumer_key, :consumer_secret do |prop| # omit the arguments to get a catch-all not_configured
