@@ -1,4 +1,4 @@
-Rails.application.routes.draw do
+AppdirectIntegration::Engine.routes.draw do
   match 'appdirect/api/order' => 'appdirect_integration/appdirect_callbacks#order'
   match 'appdirect/api/change' => 'appdirect_integration/appdirect_callbacks#change'
   match 'appdirect/api/cancel' => 'appdirect_integration/appdirect_callbacks#cancel'

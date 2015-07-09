@@ -38,3 +38,7 @@ Bug reports and pull requests are welcome on GitHub at https://github.com/artgo/
 ## CHANGELOG
 
 See [here](CHANGELOG.md).
+
+## Documentation
+
+See AppDirect API documentation [here](http://info.appdirect.com/developers/docs/getting-started/introduction).

@@ -1,1 +1,5 @@
-class Engine < Rails::Engine; end
+module AppdirectIntegration
+  class Engine < ::Rails::Engine
+    isolate_namespace AppdirectIntegration
+  end
+end
