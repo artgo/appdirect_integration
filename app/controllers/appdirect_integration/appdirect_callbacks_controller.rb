@@ -3,7 +3,7 @@ module AppdirectIntegration
     def order
       puts "Received order from AppDirect"
 
-      render xml: {result: {success: true, message: 'Account creation successful', accountIdentifier: 'new-account-identifier'}}
+      render xml: {success: true, message: 'Account creation successful', accountIdentifier: token}.to_xml(root: 'result')
     end
 
     def change
