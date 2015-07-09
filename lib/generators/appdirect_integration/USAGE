@@ -1,0 +1,8 @@
+Description:
+    Generate initializer for AppDirect integration
+
+Example:
+    rails generate initializer_generator appdirect
+
+    This will create:
+        config/initializers/appdirect.rb

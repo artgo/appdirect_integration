@@ -1,0 +1,15 @@
+===============================================================================
+
+Some setup you must do manually if you haven't yet:
+
+  1. Register with AppDirect (free): https://www.appdirect.com/developers/register
+
+  2. Create an application and and copy your consumer key and consumer secret.
+
+  3. Generate appdirect.rb initializer by running:
+
+       rails g appdirect_integration:install
+
+  4. Edit initializer config/initializers/appdirect.rb and specify your consumer key and consumer secret there.
+
+===============================================================================
