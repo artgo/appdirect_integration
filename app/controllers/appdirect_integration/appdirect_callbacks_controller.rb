@@ -21,7 +21,7 @@ module AppdirectIntegration
 
       puts "Requesting #{site}#{req.path}"
 
-      result = Net::HTTP.get(URI.parse(site), req.path)
+      result = Net::HTTP.get(site, req.path)
 
       puts "XML Result: #{result.to_s}"
 
