@@ -15,7 +15,7 @@ module AppdirectIntegration
   end
 
   not_configured :consumer_key, :consumer_secret, :order_class do |prop| # omit the arguments to get a catch-all not_configured
-    error :not_configured, "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
+    puts "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
     raise ArgumentError, "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
   end
 end
