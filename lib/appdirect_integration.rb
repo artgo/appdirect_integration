@@ -3,7 +3,7 @@ require 'appdirect_integration/engine'
 require 'appdirect_integration/configuration'
 
 module AppdirectIntegration
-  mattr_reader :configuration
+  mattr_accessor :configuration
 
   def self.configure(&block)
     self.configuration ||= Configuration.new
