@@ -1,7 +1,6 @@
 require 'oauth'
 require 'net/http'
 require 'appdirect_integration'
-require 'configurations'
 
 module AppdirectIntegration
   class AppdirectCallbacksController < ApplicationController

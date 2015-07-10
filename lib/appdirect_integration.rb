@@ -1,21 +1,22 @@
 require 'appdirect_integration/version'
 require 'appdirect_integration/engine'
-require 'configurations'
+require 'appdirect_integration/configuration'
 
 module AppdirectIntegration
-	include Configurations
+  mattr_reader :configuration
 
-	configurable String, :appdirect_url
-  configurable String, :consumer_key
-  configurable String, :consumer_secret
-  configurable Class, :order_class
-
-  configuration_defaults do |c|
-    c.appdirect_url = 'https://www.appdirect.com'
+  def self.configure(&block)
+    self.configuration ||= Configuration.new
+    block.call self.configuration
   end
 
-  not_configured :consumer_key, :consumer_secret, :order_class do |prop| # omit the arguments to get a catch-all not_configured
-    puts "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
-    raise ArgumentError, "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
-  end
+
+  # configuration_defaults do |c|
+  #   c.appdirect_url = 'https://www.appdirect.com'
+  # end
+
+  # not_configured :consumer_key, :consumer_secret, :order_class do |prop| # omit the arguments to get a catch-all not_configured
+  #   puts "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
+  #   raise ArgumentError, "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
+  # end
 end
