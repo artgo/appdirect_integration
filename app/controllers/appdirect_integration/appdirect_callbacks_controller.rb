@@ -1,5 +1,6 @@
 require 'oauth'
 require 'net/http'
+require 'appdirect_integration'
 
 module AppdirectIntegration
   class AppdirectCallbacksController < ApplicationController
@@ -9,10 +10,13 @@ module AppdirectIntegration
       #event_url = "#{AppdirectIntegration.configuration.appdirect_url}/api/integration/v1/events/#{token}"
       site = AppdirectIntegration.configuration.appdirect_url
       path = "/api/integration/v1/events/#{token}"
-      consumer = OAuth::Consumer.new(AppdirectIntegration.configuration.consumer_key,
-                                     AppdirectIntegration.configuration.consumer_secret, {
+
+      puts "Basic path #{site}#{path}"
+
+      consumer = OAuth::Consumer.new(AppdirectIntegration.configuration.consumer_key.to_s,
+                                     AppdirectIntegration.configuration.consumer_secret.to_s, {
                                        :site => site,
-      :scheme => :query_string })
+                                       :scheme => :query_string })
       req = consumer.create_signed_request(:get, path)
 
       puts "Requesting #{site}#{req.path}"
