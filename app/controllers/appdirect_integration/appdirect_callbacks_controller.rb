@@ -18,9 +18,9 @@ module AppdirectIntegration
                                        :site => site,
                                        :scheme => :query_string })
       req = consumer.create_signed_request(:get, path)
-      full_path = "#{full_path}"
+      full_path = "#{site}#{req.path}"
 
-      puts "Requesting #{site}#{req.path}"
+      puts "Requesting #{full_path}"
 
       result = Net::HTTP.get(URI.parse(full_path))
 
