@@ -1,5 +1,6 @@
 require 'oauth'
-require 'net/http'
+#require 'net/http'
+require 'rest-client'
 require 'appdirect_integration'
 
 module AppdirectIntegration
@@ -22,24 +23,25 @@ module AppdirectIntegration
 
       puts "Requesting #{full_path}"
 
-      result = Net::HTTP.get(URI.parse(full_path))
+      #result = Net::HTTP.get(URI.parse(full_path))
+      result = RestClient.get full_path, :content_type => :json, :accept => :json
 
-      puts "XML Result: #{result.to_s}"
+      puts "JSON Result: #{result.to_s}"
 
-      parsed_result = Hash.from_xml(result)
+      parsed_result = JSON.parse(result.to_s)
 
       puts "Parsed json result: #{parsed_result.to_s}"
 
-      company = parsed_result[:event][:payload][:company]
-      user = parsed_result[:event][:creator]
-      order_data = parsed_result[:event][:payload][:order]
+      company = parsed_result[:payload][:company]
+      user = parsed_result[:creator]
+      order_data = parsed_result[:payload][:order]
 
       order = AppdirectIntegration.configuration.order_class.new({
                                                                    company_name: company[:name],
                                                                    company_email: company[:email],
                                                                    company_phone: company[:phone],
                                                                    user_name: "#{user[:firstName]} #{user[:lastName]}",
-                                                                   quantity: order_data[:item][0][:quantity]
+                                                                   quantity: order_data[:items][0][:quantity]
       })
 
       if order.save
