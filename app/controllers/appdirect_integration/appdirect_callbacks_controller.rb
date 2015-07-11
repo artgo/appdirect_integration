@@ -13,9 +13,8 @@ module AppdirectIntegration
       puts "Basic path #{site}#{path}"
 
       consumer = OAuth::Consumer.new(AppdirectIntegration.configuration.consumer_key.to_s,
-                                     AppdirectIntegration.configuration.consumer_secret.to_s, {
-                                       :site => site,
-      :scheme => :query_string })
+                                     AppdirectIntegration.configuration.consumer_secret.to_s,
+                                     { :site => site, :scheme => :query_string })
       req = consumer.create_signed_request(:get, path)
       full_path = "#{site}#{req.path}"
 
@@ -27,9 +26,7 @@ module AppdirectIntegration
 
       parsed_result = ActiveSupport::JSON.decode(result.to_s)
 
-      params = convert_to_params(parsed_result)
-
-      order = AppdirectIntegration.configuration.order_class.new(params)
+      order = build_order_object(parsed_result)
 
       if order.save
         render xml: success_response('Account creation successful', order.id.to_s)
@@ -64,7 +61,7 @@ module AppdirectIntegration
       params[:token]
     end
 
-    def convert_to_params(parsed_result)
+    def build_order_object(parsed_result)
       company = parsed_result["payload"]["company"]
       user = parsed_result["creator"]
       order_data = parsed_result["payload"]["order"]
@@ -77,15 +74,17 @@ module AppdirectIntegration
       quantity = order_data["items"][0]["quantity"]
       edition = order_data["editionCode"]
 
-      {
-        company_name: company_name,
-        company_email: company_email,
-        company_phone: company_phone,
-        user_name: user_name,
-        quantity: quantity,
-        edition: edition,
-        status: 'ACTIVE'
-      }
+      order = AppdirectIntegration.configuration.order_class.new
+
+      order.company_name = company_name if order.respond_to?('company_name=')
+      order.company_email = company_email if order.respond_to?('company_email=')
+      order.company_phone = company_phone if order.respond_to?('company_phone=')
+      order.user_name = user_name if order.respond_to?('user_name=')
+      order.quantity = quantity if order.respond_to?('quantity=')
+      order.edition = edition if order.respond_to?('edition=')
+      order.status = 'ACTIVE' if order.respond_to?('status=')
+
+      order
     end
 
     def success_response(message, account_id)
