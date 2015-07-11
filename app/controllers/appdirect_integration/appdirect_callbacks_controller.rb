@@ -1,5 +1,4 @@
 require 'oauth'
-#require 'net/http'
 require 'rest-client'
 require 'appdirect_integration'
 
@@ -8,7 +7,6 @@ module AppdirectIntegration
     def order
       puts "Received order from AppDirect, requesting info..."
 
-      #event_url = "#{AppdirectIntegration.configuration.appdirect_url}/api/integration/v1/events/#{token}"
       site = AppdirectIntegration.configuration.appdirect_url
       path = "/api/integration/v1/events/#{token}"
 
@@ -17,32 +15,21 @@ module AppdirectIntegration
       consumer = OAuth::Consumer.new(AppdirectIntegration.configuration.consumer_key.to_s,
                                      AppdirectIntegration.configuration.consumer_secret.to_s, {
                                        :site => site,
-                                       :scheme => :query_string })
+      :scheme => :query_string })
       req = consumer.create_signed_request(:get, path)
       full_path = "#{site}#{req.path}"
 
       puts "Requesting #{full_path}"
 
-      #result = Net::HTTP.get(URI.parse(full_path))
       result = RestClient.get full_path, :content_type => :json, :accept => :json
 
       puts "JSON Result: #{result.to_s}"
 
       parsed_result = ActiveSupport::JSON.decode(result.to_s)
 
-      #puts "Parsed json result: #{parsed_result.to_s}"
+      params = convert_to_params(parsed_result)
 
-      company = parsed_result["payload"]["company"]
-      user = parsed_result["creator"]
-      order_data = parsed_result["payload"]["order"]
-
-      order = AppdirectIntegration.configuration.order_class.new({
-                                                                   company_name: company["name"],
-                                                                   company_email: company["email"],
-                                                                   company_phone: company["phone"],
-                                                                   user_name: "#{user["firstName"]} #{user["lastName"]}",
-                                                                   quantity: order_data["items"][0]["quantity"]
-      })
+      order = AppdirectIntegration.configuration.order_class.new(params)
 
       if order.save
         render xml: success_response('Account creation successful', order.id.to_s)
@@ -70,6 +57,29 @@ module AppdirectIntegration
     # Never trust parameters from the scary internet, only allow the white list through.
     def token
       params[:token]
+    end
+
+    def convert_to_params(parsed_result)
+      company = parsed_result["payload"]["company"]
+      user = parsed_result["creator"]
+      order_data = parsed_result["payload"]["order"]
+
+      company_name = company["name"]
+      company_email = company["email"]
+      company_email = user["email"] if company_email.blank?
+      company_phone = company["phoneNumber"]
+      user_name = "#{user["firstName"]} #{user["lastName"]}"
+      quantity = order_data["items"][0]["quantity"]
+      edition = order_data["editionCode"]
+
+      {
+        company_name: company_name,
+        company_email: company_email,
+        company_phone: company_phone,
+        user_name: user_name,
+        quantity: quantity,
+        edition: edition
+      }
     end
 
     def success_response(message, account_id)
