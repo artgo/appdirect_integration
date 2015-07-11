@@ -53,6 +53,11 @@ module AppdirectIntegration
       render xml: success_response('Account creation successful', '123')
     end
 
+    def notify
+      puts "notify"
+      render xml: success_response('Account creation successful', '123')
+    end
+
     private
     # Never trust parameters from the scary internet, only allow the white list through.
     def token
@@ -78,7 +83,8 @@ module AppdirectIntegration
         company_phone: company_phone,
         user_name: user_name,
         quantity: quantity,
-        edition: edition
+        edition: edition,
+        status: 'ACTIVE'
       }
     end
 
