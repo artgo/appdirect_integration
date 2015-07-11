@@ -28,20 +28,20 @@ module AppdirectIntegration
 
       puts "JSON Result: #{result.to_s}"
 
-      parsed_result = JSON.parse(result.to_s)
+      parsed_result = ActiveSupport::JSON.decode(result.to_s)
 
-      puts "Parsed json result: #{parsed_result.to_s}"
+      #puts "Parsed json result: #{parsed_result.to_s}"
 
-      company = parsed_result[:payload][:company]
-      user = parsed_result[:creator]
-      order_data = parsed_result[:payload][:order]
+      company = parsed_result["payload"]["company"]
+      user = parsed_result["creator"]
+      order_data = parsed_result["payload"]["order"]
 
       order = AppdirectIntegration.configuration.order_class.new({
-                                                                   company_name: company[:name],
-                                                                   company_email: company[:email],
-                                                                   company_phone: company[:phone],
-                                                                   user_name: "#{user[:firstName]} #{user[:lastName]}",
-                                                                   quantity: order_data[:items][0][:quantity]
+                                                                   company_name: company["name"],
+                                                                   company_email: company["email"],
+                                                                   company_phone: company["phone"],
+                                                                   user_name: "#{user["firstName"]} #{user["lastName"]}",
+                                                                   quantity: order_data["items"][0]["quantity"]
       })
 
       if order.save
