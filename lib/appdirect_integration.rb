@@ -7,16 +7,16 @@ module AppdirectIntegration
 
   def self.configure(&block)
     self.configuration ||= Configuration.new
+    self.configuration.appdirect_url = 'https://www.appdirect.com'
     block.call self.configuration
+    if self.configuration.order_class.nil?
+      raise "Please configure order_class to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
+    end
+    if self.configuration.consumer_key.nil?
+      raise "Please configure consumer_key to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
+    end
+    if self.configuration.consumer_secret.nil?
+      raise "Please configure consumer_secret to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
+    end
   end
-
-
-  # configuration_defaults do |c|
-  #   c.appdirect_url = 'https://www.appdirect.com'
-  # end
-
-  # not_configured :consumer_key, :consumer_secret, :order_class do |prop| # omit the arguments to get a catch-all not_configured
-  #   puts "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
-  #   raise ArgumentError, "Please configure #{prop} to make AppDirect integration work. Use rake appdirect_integration:install to generate defaults"
-  # end
 end

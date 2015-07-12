@@ -7,24 +7,7 @@ module AppdirectIntegration
     def order
       puts "Received order from AppDirect, requesting info..."
 
-      site = AppdirectIntegration.configuration.appdirect_url
-      path = "/api/integration/v1/events/#{token}"
-
-      puts "Basic path #{site}#{path}"
-
-      consumer = OAuth::Consumer.new(AppdirectIntegration.configuration.consumer_key.to_s,
-                                     AppdirectIntegration.configuration.consumer_secret.to_s,
-                                     { :site => site, :scheme => :query_string })
-      req = consumer.create_signed_request(:get, path)
-      full_path = "#{site}#{req.path}"
-
-      puts "Requesting #{full_path}"
-
-      result = RestClient.get full_path, :content_type => :json, :accept => :json
-
-      puts "JSON Result: #{result.to_s}"
-
-      parsed_result = ActiveSupport::JSON.decode(result.to_s)
+      parsed_result = read_event_data()
 
       order = build_order_object(parsed_result)
 
@@ -59,6 +42,29 @@ module AppdirectIntegration
     # Never trust parameters from the scary internet, only allow the white list through.
     def token
       params[:token]
+    end
+
+    def read_event_data
+      site = AppdirectIntegration.configuration.appdirect_url
+      path = "/api/integration/v1/events/#{token}"
+
+      puts "Basic path #{site}#{path}"
+
+      consumer = OAuth::Consumer.new(AppdirectIntegration.configuration.consumer_key.to_s,
+                                     AppdirectIntegration.configuration.consumer_secret.to_s,
+                                     { :site => site, :scheme => :query_string })
+      req = consumer.create_signed_request(:get, path)
+      full_path = "#{site}#{req.path}"
+
+      puts "Requesting #{full_path}"
+
+      result = RestClient.get full_path, :content_type => :json, :accept => :json
+
+      puts "JSON Result: #{result.to_s}"
+
+      parsed_result = ActiveSupport::JSON.decode(result.to_s)
+
+      parsed_result
     end
 
     def build_order_object(parsed_result)
