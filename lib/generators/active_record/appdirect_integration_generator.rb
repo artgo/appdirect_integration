@@ -40,7 +40,7 @@ module ActiveRecord
       def migration_data
         data = "\n"
         AppdirectIntegration::FIELDS.each do |field|
-          data += "      t.string :#{field[:name]}\n"
+          data += "      t.#{field[:type]} :#{field[:name]}\n"
         end
 
         data

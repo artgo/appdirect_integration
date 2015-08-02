@@ -25,6 +25,22 @@ Add appdirect_integration gem to Gemfile
    gem 'appdirect_integration'
 ```
 
+Add Genrate your Order scaffold
+```ruby
+   rails g scaffold Order
+```
+
+Setup Order model to work with AppDirect and generate migrations
+```ruby
+   rails g appdirect_integration Order
+```
+
+Generate configuration
+```ruby
+   rails g appdirect_integration:install
+```
+which will generate `config/appdirect.rb` file which you need to check to setup (may be change your model name).
+
 gem will automatically create (new) and save your Order ActiveRecord/Mongoid object
 
 the list of supported fields:
@@ -65,11 +81,11 @@ the list of supported fields:
 * `quantity3`
 * `unit3`
 * `all_data`
-* `order_items` - should be mentioned as `has_many:` (`embeds_many:`) `order_items`
+* `order_items` - should be mentioned as `has_many: order_items` for ActiveRecord or `embeds_many: order_items` for Mongoid
 
-For order_items OrderItem:
-* unit
-* quantity
+Fields for order_items OrderItem:
+* `unit`
+* `quantity`
 
 ## Development
 

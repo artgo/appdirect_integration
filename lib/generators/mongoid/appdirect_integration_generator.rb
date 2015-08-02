@@ -22,7 +22,7 @@ module Mongoid
       def migration_data
         data = "\n"
         AppdirectIntegration::FIELDS.each do |field|
-          data += "  field :#{field[:name]}, type: String\n"
+          data += "  field :#{field[:name]}, type: #{AppdirectIntegration::AR_TO_MONGOID[field[:type]]}\n"
         end
 
         data
