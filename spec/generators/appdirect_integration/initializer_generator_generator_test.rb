@@ -1,4 +1,4 @@
-require 'test_helper'
+require 'spec_helper'
 require 'generators/initializer_generator/initializer_generator_generator'
 
 module AppdirectIntegration

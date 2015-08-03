@@ -5,7 +5,18 @@ describe AppdirectIntegration do
     expect(AppdirectIntegration::VERSION).not_to be nil
   end
 
-  it 'does something useful' do
-    expect(false).to eq(true)
+  describe 'configuration' do
+    before do
+      AppdirectIntegration.configure do |c|
+      end
+    end
+
+    it 'exists' do
+      expect(AppdirectIntegration.configuration).not_to be nil
+    end
+
+    it 'points to appdirect' do
+      expect(AppdirectIntegration.configuration.appdirect_url).to eq 'https://www.appdirect.com'
+    end
   end
 end
