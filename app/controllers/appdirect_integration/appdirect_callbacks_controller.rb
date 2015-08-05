@@ -7,12 +7,13 @@ require 'appdirect_integration/util'
 module AppdirectIntegration
   class AppdirectCallbacksController < ApplicationController
     def order
-      puts "Received order from AppDirect, requesting info..."
+      puts "Received order event from AppDirect, requesting info..."
 
       parsed_result = read_event_data()
 
       order = AppdirectIntegration.configuration.order_class.new
       order = build_order_object(parsed_result, order)
+
       order.status = 'ACTIVE' if order.respond_to?('status=')
 
       if order.save
@@ -23,45 +24,18 @@ module AppdirectIntegration
     end
 
     def change
-      puts "Received order from AppDirect, requesting info..."
-
-      parsed_result = read_event_data()
-
-      id = parsed_result["payload"]["account"]["accountIdentifier"]
-
-      order = AppdirectIntegration.configuration.order_class.find(id)
-      order = build_order_object(parsed_result, order)
-
-      render json: success_response('Account creation successful', id)
+      respond_to_event('change')
     end
 
     def cancel
-      puts "Received order from AppDirect, requesting info..."
-
-      parsed_result = read_event_data()
-      render json: success_response('Account creation successful', '123')
-    end
-
-    def status
-      puts "Received order from AppDirect, requesting info..."
-
-      parsed_result = read_event_data()
-      render json: success_response('Account creation successful', '123')
+      respond_to_event('cancel')
     end
 
     def notify
-      puts "Received order from AppDirect, requesting info..."
-
-      parsed_result = read_event_data()
-      render json: success_response('Account creation successful', '123')
+      respond_to_event('notify')
     end
 
     private
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def token
-      params[:token]
-    end
-
     def event_url
       params[:eventUrl]
     end
@@ -96,15 +70,36 @@ module AppdirectIntegration
       parsed_result
     end
 
-    def update_order_object(parsed_result, order)
+    def respond_to_event(name)
+      puts "Received #{name} event from AppDirect, requesting info..."
+
+      parsed_result = read_event_data()
+
+      id = parsed_result["payload"]["account"]["accountIdentifier"]
+
+      order = AppdirectIntegration.configuration.order_class.find(id)
+      order = update_order_object(parsed_result, order)
+
+      if order.save
+        render json: success_response("Event #{name} processed successfuly", id)
+      else
+        render json: fault_response('Error updating account', 'UNKNOWN_ERROR')
+      end
+    end
+
+    def build_order_object(parsed_result, order)
       Util.copy_known_fields(order, parsed_result)
 
-      if !order_data["items"].nil? && order_data["items"].length > 0
-        if order.respond_to?('order_items') && order.order_items.respond_to?('build')
-          order_data["items"].each do |item|
-            order_item = order.order_items.build()
-            order_item.quantity = order_item["quantity"] if order_item.respond_to?('quantity=')
-            order_item.unit = order_item["unit"] if order_item.respond_to?('unit=')
+      if parsed_result["payload"].present?
+        order_data = parsed_result["payload"]["order"]
+
+        if !order_data["items"].nil? && order_data["items"].length > 0
+          if order.respond_to?('order_items') && order.order_items.respond_to?('build')
+            order_data["items"].each do |item|
+              order_item = order.order_items.build()
+              order_item.quantity = order_item["quantity"] if order_item.respond_to?('quantity=')
+              order_item.unit = order_item["unit"] if order_item.respond_to?('unit=')
+            end
           end
         end
       end
@@ -114,12 +109,31 @@ module AppdirectIntegration
       order
     end
 
+    def update_order_object(parsed_result, order)
+      Util.copy_known_fields(order, parsed_result)
+
+      if parsed_result["payload"].present?
+        order_data = parsed_result["payload"]["order"]
+
+        if !order_data["items"].nil? && order_data["items"].length > 0
+          if order.respond_to?('order_items') && order.order_items.respond_to?('build')
+            order_data["items"].each do |item|
+              order_item = order.order_items.find_or_create_by(unit: order_item["unit"])
+              order_item.quantity = order_item["quantity"] if order_item.respond_to?('quantity=')
+            end
+          end
+        end
+      end
+
+      order
+    end
+
     def success_response(message, account_id)
-      {success: true, message: message, accountIdentifier: account_id}.to_json #.to_xml(root: 'result')
+      {success: true, message: message, accountIdentifier: account_id}.to_json
     end
 
     def fault_response(message, error_code)
-      {success: false, errorCode: error_code, message: message}.to_json #.to_xml(root: 'result')
+      {success: false, errorCode: error_code, message: message}.to_json
     end
   end
 end
