@@ -28,7 +28,7 @@ module AppdirectIntegration
     end
 
     def cancel
-      respond_to_event('cancel')
+      respond_to_event('cancel', 'CANCELLED')
     end
 
     def notify
@@ -70,7 +70,7 @@ module AppdirectIntegration
       parsed_result
     end
 
-    def respond_to_event(name)
+    def respond_to_event(name, new_status)
       puts "Received #{name} event from AppDirect, requesting info..."
 
       parsed_result = read_event_data()
@@ -79,6 +79,10 @@ module AppdirectIntegration
 
       order = AppdirectIntegration.configuration.order_class.find(id)
       order = update_order_object(parsed_result, order)
+
+      if new_status.present? && order.respond_to?('status=')
+        order.status = new_status
+      end
 
       if order.save
         render json: success_response("Event #{name} processed successfuly", id)
@@ -93,12 +97,12 @@ module AppdirectIntegration
       if parsed_result["payload"].present?
         order_data = parsed_result["payload"]["order"]
 
-        if !order_data["items"].nil? && order_data["items"].length > 0
+        if order_data.present? && order_data["items"].present? && order_data["items"].length > 0
           if order.respond_to?('order_items') && order.order_items.respond_to?('build')
             order_data["items"].each do |item|
               order_item = order.order_items.build()
-              order_item.quantity = order_item["quantity"] if order_item.respond_to?('quantity=')
-              order_item.unit = order_item["unit"] if order_item.respond_to?('unit=')
+              order_item.quantity = item["quantity"] if order_item.respond_to?('quantity=')
+              order_item.unit = item["unit"] if order_item.respond_to?('unit=')
             end
           end
         end
@@ -115,11 +119,11 @@ module AppdirectIntegration
       if parsed_result["payload"].present?
         order_data = parsed_result["payload"]["order"]
 
-        if !order_data["items"].nil? && order_data["items"].length > 0
+        if order_data.present? && order_data["items"].present? && order_data["items"].length > 0
           if order.respond_to?('order_items') && order.order_items.respond_to?('build')
             order_data["items"].each do |item|
-              order_item = order.order_items.find_or_create_by(unit: order_item["unit"])
-              order_item.quantity = order_item["quantity"] if order_item.respond_to?('quantity=')
+              order_item = order.order_items.find_or_create_by(unit: item["unit"])
+              order_item.quantity = item["quantity"] if order_item.respond_to?('quantity=')
             end
           end
         end
