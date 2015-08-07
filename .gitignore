@@ -7,10 +7,14 @@ doc/
 pkg/
 spec/reports/
 tmp/
-log/*.log
+log/
 spec/dummy/db/*.sqlite3
 spec/dummy/db/*.sqlite3-journal
-spec/dummy/log/*.log
+spec/dummy/log/
 spec/dummy/tmp/
 spec/dummy/.sass-cache
 .DS_Store
+*~
+*.sqlite3
+rdoc/*
+spec/tmp/

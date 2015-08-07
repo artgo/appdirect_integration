@@ -6,10 +6,13 @@ Some setup you must do manually if you haven't yet:
 
   2. Create an application and and copy your consumer key and consumer secret.
 
-  3. Generate appdirect.rb initializer by running:
+  3. Generate your Order scaffold
 
-       rails g appdirect_integration:install
+       rails g scaffold Order
+  4. Setup Order model to work with AppDirect and generate migrations
 
-  4. Edit initializer config/initializers/appdirect.rb and specify your consumer key and consumer secret there.
+       rails g appdirect_integration Order
+
+  5. Edit initializer config/initializers/appdirect.rb and specify your consumer key, consumer secret, and Order model there.
 
 ===============================================================================

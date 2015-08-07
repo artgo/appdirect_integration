@@ -21,12 +21,16 @@ Or install it yourself as:
 
 ## Usage
 
+Register with AppDirect (free): https://www.appdirect.com/developers/register
+
+Create an application and and copy your consumer key and consumer secret.
+
 Add appdirect_integration gem to Gemfile
 ```ruby
    gem 'appdirect_integration'
 ```
 
-Add Genrate your Order scaffold
+Add Generate your Order scaffold
 ```ruby
    rails g scaffold Order
 ```
@@ -40,9 +44,11 @@ Generate configuration
 ```ruby
    rails g appdirect_integration:install
 ```
-which will generate `config/appdirect.rb` file which you need to check to setup (may be change your model name).
+which will generate `config/initializers/appdirect.rb` file.
 
-gem will automatically create (new) and save your Order ActiveRecord/Mongoid object
+Edit initializer config/initializers/appdirect.rb and specify your consumer key, consumer secret, and Order model there.
+
+gem will automatically create (new) and save your Order ActiveRecord/Mongoid object at runtime.
 
 the list of supported fields:
 * `company_uuid`
